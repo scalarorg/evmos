@@ -5,7 +5,7 @@ CHAINID=${CHAINID:-escalar_2024-1}
 MONIKER=${MONIKER}
 KEYRING=${KEYRING:-test}
 EVMOSD=evmosd
-DATA_DIR=/opt/evmos
+DATA_DIR=/opt/abci
 
 rm -rf ${DATA_DIR}/config
 rm -rf ${DATA_DIR}/data
