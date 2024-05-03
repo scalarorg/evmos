@@ -11,9 +11,10 @@ services:
       service: scalar-evmos
     container_name: scalar-evmos1
     ports:
-      - "26617:26657"
-    env_file:
-      - ./envs/.env.evmos1
+      - "26618:26658"
+    environment:
+      - KEYNAME=scalarabci1
+      - MONIKER=scalarabci1
     volumes:
       - ./runtime/evmos1:/opt/evmos
     command: ["/scripts/start-docker.sh"]
@@ -27,9 +28,10 @@ services:
       service: scalar-evmos
     container_name: scalar-evmos2
     ports:
-      - "26627:26657"
-    env_file:
-      - ./envs/.env.evmos2
+      - "26628:26658"
+    environment:
+      - KEYNAME=scalarabci2
+      - MONIKER=scalarabci2
     volumes:
       - ./runtime/evmos2:/opt/evmos
     command: ["/scripts/start-docker.sh"]
@@ -43,9 +45,10 @@ services:
       service: scalar-evmos
     container_name: scalar-evmos3
     ports:
-      - "26637:26657"
-    env_file:
-      - ./envs/.env.evmos3
+      - "26638:26658"
+    environment:
+      - KEYNAME=scalarabci3
+      - MONIKER=scalarabci3
     volumes:
       - ./runtime/evmos3:/opt/evmos
     command: ["/scripts/start-docker.sh"]
@@ -59,9 +62,10 @@ services:
       service: scalar-evmos
     container_name: scalar-evmos4
     ports:
-      - "26647:26657"
-    env_file:
-      - ./envs/.env.evmos4
+      - "26648:26658"
+    environment:
+      - KEYNAME=scalarabci4
+      - MONIKER=scalarabci4
     volumes:
       - ./runtime/evmos4:/opt/evmos
     command: ["/scripts/start-docker.sh"]
