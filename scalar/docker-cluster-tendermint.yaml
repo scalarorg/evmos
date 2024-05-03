@@ -1,0 +1,78 @@
+version: "3.9"
+networks:
+  scalar_evmos:
+    ipam:
+      config:
+        - subnet: 172.22.0.0/24
+services:
+  scalar-tendermint1:
+    extends:
+      file: ./docker-compose-evmos.yaml
+      service: scalar-evmos
+    container_name: scalar-tendermint1
+    ports:
+      - "26616:26656"
+    env_file:
+      - ../runtime/tendermint1/.env
+      - ../runtime/tendermint/seeds/scalartendermint1
+    volumes:
+      - ../runtime/tendermint1:/opt/tendermint
+      - ../runtime/tendermint/seeds:/opt/seeds
+    command: ["/scripts/start-tendermint.sh"]
+    networks:
+      scalar_evmos:
+        ipv4_address: "172.22.0.21"
+
+  scalar-tendermint2:
+    extends:
+      file: ./docker-compose-evmos.yaml
+      service: scalar-evmos
+    container_name: scalar-tendermint2
+    ports:
+      - "26626:26656"
+    env_file:
+      - ../runtime/tendermint2/.env
+      - ../runtime/tendermint/seeds/scalartendermint2
+    volumes:
+      - ../runtime/tendermint2:/opt/tendermint
+      - ../runtime/tendermint/seeds:/opt/seeds
+    command: ["/scripts/start-tendermint.sh"]
+    networks:
+      scalar_evmos:
+        ipv4_address: "172.22.0.22"
+
+  scalar-tendermint3:
+    extends:
+      file: ./docker-compose-evmos.yaml
+      service: scalar-evmos
+    container_name: scalar-tendermint3
+    ports:
+      - "26636:26656"
+    env_file:
+      - ../runtime/tendermint3/.env
+      - ../runtime/tendermint/seeds/scalartendermint3
+    volumes:
+      - ../runtime/tendermint3:/opt/tendermint
+      - ../runtime/tendermint/seeds:/opt/seeds
+    command: ["/scripts/start-tendermint.sh"]
+    networks:
+      scalar_evmos:
+        ipv4_address: "172.22.0.23"
+
+  scalar-tendermint4:
+    extends:
+      file: ./docker-compose-evmos.yaml
+      service: scalar-evmos
+    container_name: scalar-tendermint4
+    ports:
+      - "26646:26656"
+    env_file:
+      - ../runtime/tendermint4/.env
+      - ../runtime/tendermint/seeds/scalartendermint4
+    volumes:
+      - ../runtime/tendermint4:/opt/tendermint
+      - ../runtime/tendermint/seeds:/opt/seeds
+    command: ["/scripts/start-tendermint.sh"]
+    networks:
+      scalar_evmos:
+        ipv4_address: "172.22.0.24"

@@ -12,10 +12,14 @@ import (
 // Tendermint/cosmos-sdk full-node start flags
 const (
 	WithTendermint = "with-tendermint"
-	Address        = "address"
-	Transport      = "transport"
-	TraceStore     = "trace-store"
-	CPUProfile     = "cpu-profile"
+	/* May 03
+	 * For scalar
+	 */
+	ProxyApp   = "proxy-app" //Add constant for the abci app endpoint
+	Address    = "address"
+	Transport  = "transport"
+	TraceStore = "trace-store"
+	CPUProfile = "cpu-profile"
 	// The type of database for application and snapshots databases
 	AppDBBackend = "app-db-backend"
 )

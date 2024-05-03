@@ -1,0 +1,20 @@
+version: "3.9"
+services:
+  scalar-evmos:
+    build:
+      context: ../
+      dockerfile: ./Dockerfile
+    image: scalar-evmos
+    container_name: scalar-evmos
+    #restart: unless-stopped
+    restart: no
+    volumes:
+      - ./scripts:/scripts
+    command: ["/scripts/start-docker.sh"]  
+    #command: ["evmosd", "start", "--home", "/opt/evmos"]  
+    #command: ["/bin/sh","-c","sleep infinity"]  
+    # ports:
+    #   - "8545-8546:8545-8546"
+    #   - "9090:9090"
+    #   - "26656-26657:26656-26657"
+    #   - "1317:1317"
