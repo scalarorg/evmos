@@ -15,5 +15,5 @@
 
 2. Start dockers
    ```
-   docker-compose -f docker/docker-cluster-evmos.yml up
+   docker-compose -f docker-cluster-evmos.yaml up -d
    ```
