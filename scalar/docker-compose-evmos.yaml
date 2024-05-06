@@ -7,12 +7,12 @@ services:
     image: scalar-evmos
     container_name: scalar-evmos
     #restart: unless-stopped
-    restart: no
+    restart: "no"
     volumes:
       - ./scripts:/scripts
-    command: ["/scripts/start-docker.sh"]  
-    #command: ["evmosd", "start", "--home", "/opt/evmos"]  
-    #command: ["/bin/sh","-c","sleep infinity"]  
+    command: ["/scripts/start-docker.sh"]
+    #command: ["evmosd", "start", "--home", "/opt/evmos"]
+    #command: ["/bin/sh","-c","sleep infinity"]
     # ports:
     #   - "8545-8546:8545-8546"
     #   - "9090:9090"
