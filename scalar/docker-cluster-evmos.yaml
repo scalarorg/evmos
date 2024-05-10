@@ -12,6 +12,7 @@ services:
     container_name: scalar-evmos1
     ports:
       - "26618:26658"
+      - "8145:8545"
     environment:
       - KEYNAME=scalarabci1
       - MONIKER=scalarabci1
@@ -29,6 +30,7 @@ services:
     container_name: scalar-evmos2
     ports:
       - "26628:26658"
+      - "8245:8545"
     environment:
       - KEYNAME=scalarabci2
       - MONIKER=scalarabci2
@@ -46,6 +48,7 @@ services:
     container_name: scalar-evmos3
     ports:
       - "26638:26658"
+      - "8345:8545"
     environment:
       - KEYNAME=scalarabci3
       - MONIKER=scalarabci3
@@ -63,6 +66,7 @@ services:
     container_name: scalar-evmos4
     ports:
       - "26648:26658"
+      - "8445:8545"
     environment:
       - KEYNAME=scalarabci4
       - MONIKER=scalarabci4
