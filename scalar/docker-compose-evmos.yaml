@@ -10,11 +10,15 @@ services:
     restart: no
     volumes:
       - ./scripts:/scripts
+      - ./runtime/evmos:/opt/evmos
     command: ["/scripts/start-docker.sh"]  
     #command: ["evmosd", "start", "--home", "/opt/evmos"]  
     #command: ["/bin/sh","-c","sleep infinity"]  
-    # ports:
-    #   - "8545-8546:8545-8546"
-    #   - "9090:9090"
-    #   - "26656-26657:26656-26657"
-    #   - "1317:1317"
+    ports:
+      - "8545-8546:8545-8546"
+      - "9090:9090"
+      - "26656-26658:26656-26658"
+      - "1317:1317"
+    environment:
+      - KEYNAME=scalarisabci
+      - MONIKER=scalarisabci  
