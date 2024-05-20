@@ -1,0 +1,29 @@
+name: Deploy with Docker Compose
+
+on:
+  push:
+    branches:
+      - actions/build-staging
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Run docker-compose up on remote host
+      env:
+        COMMIT_SHA: ${{ github.sha }}
+        CONTAINER_NAME: "your_service"
+        SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
+        SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+        SSH_DESTINATION: ${{ secrets.SSH_DESTINATION }}
+        SSH_PORT: ${{ secrets.SSH_PORT }}
+      run: |
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no -p "$SSH_PORT" "$SSH_USERNAME"@"$SSH_DESTINATION" "
+          cd /path/to/your/project &&
+          CONTAINER_PREFIX=\$(echo $COMMIT_SHA | head -c 7) &&
+          docker-compose -f scalar/docker-cluster-evmos.yaml -p $CONTAINER_PREFIX up -d 
+        "
