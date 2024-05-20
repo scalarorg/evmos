@@ -25,6 +25,5 @@ jobs:
         docker-compose \
             -H "ssh://${{ secrets.SSH_USERNAME }}:${{ secrets.SSH_PASSWORD }}@${{ secrets.SSH_DESTINATION }}:${{ secrets.SSH_PORT }}" \
             -f ./scalar/docker-cluster-evmos.yaml \
-            -d \
             -p $COMMIT_SHA \
-            up 
+            up -d
