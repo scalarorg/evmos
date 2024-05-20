@@ -22,6 +22,9 @@ jobs:
         SSH_DESTINATION: ${{ secrets.SSH_DESTINATION }}
         SSH_PORT: ${{ secrets.SSH_PORT }}
       run: |
-        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no -p "$SSH_PORT" "$SSH_USERNAME"@"$SSH_DESTINATION" "
-          docker-compose -f scalar/docker-cluster-evmos.yaml -p $COMMIT_SHA up -d 
-        "
+        docker-compose \
+            -H "ssh://${{ secrets.SSH_USERNAME }}:${{ secrets.SSH_PASSWORD }}@${{ secrets.SSH_DESTINATION }}:${{ secrets.SSH_PORT }}" \
+            -f ./scalar/docker-cluster-evmos.yaml \
+            -d \
+            -p $COMMIT_SHA \
+            up 
