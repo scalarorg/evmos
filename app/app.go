@@ -452,6 +452,9 @@ func NewEvmos(
 		tracer, app.GetSubspace(evmtypes.ModuleName),
 	)
 
+	// Scalar 20240527: Set chainID in EVM keeper
+	evmKeeper.SetChainID(bApp.ChainID())
+
 	app.EvmKeeper = evmKeeper
 
 	// Create IBC Keeper
