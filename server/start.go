@@ -124,11 +124,40 @@ which accepts a path for the resulting pprof file.
 				return err
 			}
 
-			withTM, _ := cmd.Flags().GetBool(srvflags.WithTendermint)
-			if !withTM {
-				serverCtx.Logger.Info("starting ABCI without Tendermint")
-				return startStandAlone(serverCtx, opts)
+			// addr := serverCtx.Viper.GetString(srvflags.Address)
+			// transport := serverCtx.Viper.GetString(srvflags.Transport)
+			home := serverCtx.Viper.GetString(flags.FlagHome)
+
+			db, err := opts.DBOpener(serverCtx.Viper, home, server.GetAppDBBackend(serverCtx.Viper))
+			if err != nil {
+				serverCtx.Logger.Error("failed to open DB", "error", err.Error())
+				return err
 			}
+			defer func() {
+				if err := db.Close(); err != nil {
+					serverCtx.Logger.Error("error closing db", "error", err.Error())
+				}
+			}()
+
+			traceWriterFile := serverCtx.Viper.GetString(srvflags.TraceStore)
+			traceWriter, err := openTraceWriter(traceWriterFile)
+			if err != nil {
+				return err
+			}
+
+			app := opts.AppCreator(serverCtx.Logger, db, traceWriter, serverCtx.Viper)
+
+			// withTM, _ := cmd.Flags().GetBool(srvflags.WithTendermint)
+			// if !withTM {
+			serverCtx.Logger.Info("starting ABCI without Tendermint")
+			go func() {
+
+				err := startStandAlone(serverCtx, opts, app)
+				if err != nil {
+					serverCtx.Logger.Error("failed to start ABCI without Tendermint", "error", err.Error())
+				}
+			}()
+			// }
 
 			serverCtx.Logger.Info("Unlocking keyring")
 
@@ -144,7 +173,7 @@ which accepts a path for the resulting pprof file.
 			serverCtx.Logger.Info("starting ABCI with Tendermint")
 
 			// amino is needed here for backwards compatibility of REST routes
-			err = startInProcess(serverCtx, clientCtx, opts)
+			err = startInProcess(serverCtx, clientCtx, opts, app)
 			errCode, ok := err.(server.ErrorCode)
 			if !ok {
 				return err
@@ -214,29 +243,31 @@ which accepts a path for the resulting pprof file.
 	return cmd
 }
 
-func startStandAlone(ctx *server.Context, opts StartOptions) error {
+func startStandAlone(ctx *server.Context, opts StartOptions, app types.Application) error {
+	ctx.Logger.Info("starting ABCI without Tendermint inside")
 	addr := ctx.Viper.GetString(srvflags.Address)
 	transport := ctx.Viper.GetString(srvflags.Transport)
-	home := ctx.Viper.GetString(flags.FlagHome)
+	// home := ctx.Viper.GetString(flags.FlagHome)
 
-	db, err := opts.DBOpener(ctx.Viper, home, server.GetAppDBBackend(ctx.Viper))
-	if err != nil {
-		return err
-	}
+	// ctx.Logger.Info("abci server openning db")
+	// db, err := opts.DBOpener(ctx.Viper, home, server.GetAppDBBackend(ctx.Viper))
+	// if err != nil {
+	// 	return err
+	// }
 
-	defer func() {
-		if err := db.Close(); err != nil {
-			ctx.Logger.Error("error closing db", "error", err.Error())
-		}
-	}()
+	// defer func() {
+	// 	if err := db.Close(); err != nil {
+	// 		ctx.Logger.Error("error closing db", "error", err.Error())
+	// 	}
+	// }()
 
-	traceWriterFile := ctx.Viper.GetString(srvflags.TraceStore)
-	traceWriter, err := openTraceWriter(traceWriterFile)
-	if err != nil {
-		return err
-	}
+	// traceWriterFile := ctx.Viper.GetString(srvflags.TraceStore)
+	// traceWriter, err := openTraceWriter(traceWriterFile)
+	// if err != nil {
+	// 	return err
+	// }
 
-	app := opts.AppCreator(ctx.Logger, db, traceWriter, ctx.Viper)
+	// app := opts.AppCreator(ctx.Logger, db, traceWriter, ctx.Viper)
 
 	config, err := config.GetConfig(ctx.Viper)
 	if err != nil {
@@ -249,10 +280,10 @@ func startStandAlone(ctx *server.Context, opts StartOptions) error {
 		return err
 	}
 
-	_, err = startTelemetry(config)
-	if err != nil {
-		return err
-	}
+	// _, err = startTelemetry(config)
+	// if err != nil {
+	// 	return err
+	// }
 
 	svr, err := abciserver.NewServer(addr, transport, app)
 	if err != nil {
@@ -272,12 +303,14 @@ func startStandAlone(ctx *server.Context, opts StartOptions) error {
 		}
 	}()
 
+	ctx.Logger.Info("waiting for abci server connections...")
+
 	// Wait for SIGINT or SIGTERM signal
 	return server.WaitForQuitSignals()
 }
 
 // legacyAminoCdc is used for the legacy REST API
-func startInProcess(ctx *server.Context, clientCtx client.Context, opts StartOptions) (err error) {
+func startInProcess(ctx *server.Context, clientCtx client.Context, opts StartOptions, app types.Application) (err error) {
 	cfg := ctx.Config
 	home := cfg.RootDir
 	logger := ctx.Logger
@@ -308,24 +341,24 @@ func startInProcess(ctx *server.Context, clientCtx client.Context, opts StartOpt
 		}()
 	}
 
-	db, err := opts.DBOpener(ctx.Viper, home, server.GetAppDBBackend(ctx.Viper))
-	if err != nil {
-		logger.Error("failed to open DB", "error", err.Error())
-		return err
-	}
+	// db, err := opts.DBOpener(ctx.Viper, home, server.GetAppDBBackend(ctx.Viper))
+	// if err != nil {
+	// 	logger.Error("failed to open DB", "error", err.Error())
+	// 	return err
+	// }
 
-	defer func() {
-		if err := db.Close(); err != nil {
-			ctx.Logger.With("error", err).Error("error closing db")
-		}
-	}()
+	// defer func() {
+	// 	if err := db.Close(); err != nil {
+	// 		ctx.Logger.With("error", err).Error("error closing db")
+	// 	}
+	// }()
 
-	traceWriterFile := ctx.Viper.GetString(srvflags.TraceStore)
-	traceWriter, err := openTraceWriter(traceWriterFile)
-	if err != nil {
-		logger.Error("failed to open trace writer", "error", err.Error())
-		return err
-	}
+	// traceWriterFile := ctx.Viper.GetString(srvflags.TraceStore)
+	// traceWriter, err := openTraceWriter(traceWriterFile)
+	// if err != nil {
+	// 	logger.Error("failed to open trace writer", "error", err.Error())
+	// 	return err
+	// }
 
 	config, err := config.GetConfig(ctx.Viper)
 	if err != nil {
@@ -338,7 +371,7 @@ func startInProcess(ctx *server.Context, clientCtx client.Context, opts StartOpt
 		return err
 	}
 
-	app := opts.AppCreator(ctx.Logger, db, traceWriter, ctx.Viper)
+	// app := opts.AppCreator(ctx.Logger, db, traceWriter, ctx.Viper)
 
 	nodeKey, err := p2p.LoadOrGenNodeKey(cfg.NodeKeyFile())
 	if err != nil {
@@ -398,10 +431,10 @@ func startInProcess(ctx *server.Context, clientCtx client.Context, opts StartOpt
 		app.RegisterNodeService(clientCtx)
 	}
 
-	metrics, err := startTelemetry(config)
-	if err != nil {
-		return err
-	}
+	// metrics, err := startTelemetry(config)
+	// if err != nil {
+	// 	return err
+	// }
 
 	// Enable metrics if JSONRPC is enabled and --metrics is passed
 	// Flag not added in config to avoid user enabling in config without passing in CLI
@@ -490,9 +523,9 @@ func startInProcess(ctx *server.Context, clientCtx client.Context, opts StartOpt
 		apiSrv = api.New(clientCtx, ctx.Logger.With("server", "api"))
 		app.RegisterAPIRoutes(apiSrv, config.API)
 
-		if config.Telemetry.Enabled {
-			apiSrv.SetTelemetry(metrics)
-		}
+		// if config.Telemetry.Enabled {
+		// 	apiSrv.SetTelemetry(metrics)
+		// }
 
 		errCh := make(chan error)
 		go func() {

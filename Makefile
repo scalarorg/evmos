@@ -8,6 +8,7 @@ LEDGER_ENABLED ?= true
 BINDIR ?= $(GOPATH)/bin
 EVMOS_BINARY = evmosd
 EVMOS_DIR = evmos
+CHAIN_ID = evmos_9000-1
 BUILDDIR ?= $(CURDIR)/build
 HTTPS_GIT := https://github.com/evmos/evmos.git
 DOCKER := $(shell which docker)
@@ -136,7 +137,7 @@ BUILD_TARGETS := build install
 
 build: BUILD_ARGS=-o $(BUILDDIR)/
 build-linux:
-	GOOS=linux GOARCH=amd64 LEDGER_ENABLED=false $(MAKE) build
+	GOOS=linux GOARCH=arm64 LEDGER_ENABLED=false $(MAKE) build
 
 $(BUILD_TARGETS): go.sum $(BUILDDIR)/
 	CGO_ENABLED="1" go $@ $(BUILD_FLAGS) $(BUILD_ARGS) ./...
@@ -147,7 +148,7 @@ $(BUILDDIR)/:
 build-reproducible: go.sum
 	$(DOCKER) rm latest-build || true
 	$(DOCKER) run --volume=$(CURDIR):/sources:ro \
-        --env TARGET_PLATFORMS='linux/amd64' \
+        --env TARGET_PLATFORMS='linux/arm64' \
         --env APP=evmosd \
         --env VERSION=$(VERSION) \
         --env COMMIT=$(COMMIT) \
@@ -503,7 +504,7 @@ localnet-build:
 
 # Start a 4-node testnet locally
 localnet-start: localnet-stop localnet-build
-	@if ! [ -f build/node0/$(EVMOS_BINARY)/config/genesis.json ]; then docker run --rm -v $(CURDIR)/build:/evmos:Z evmos/node "./evmosd testnet init-files --v 4 -o /evmos --keyring-backend=test --starting-ip-address 192.167.10.2"; fi
+	@if ! [ -f build/node0/$(EVMOS_BINARY)/config/genesis.json ]; then docker run --rm -v $(CURDIR)/build:/evmos:Z evmos/node "./evmosd testnet init-files --chain-id ${CHAIN_ID} --v 4 -o /evmos --keyring-backend=test --starting-ip-address 192.166.10.2"; fi
 	docker-compose up -d
 
 # Stop testnet

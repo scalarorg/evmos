@@ -5,53 +5,57 @@ services:
     container_name: evmosnode0
     image: "evmos/node"
     ports:
-      - "26656-26657:26656-26657"
+      - "8145-8146:8545-8546"
+      - "20656-20658:26656-26658"
     volumes:
       - ./build/node0/evmosd:/evmos:Z
     command:
-      - /evmosd start --home /evmos
+      - /evmosd start --home /evmos --chain-id=evmos_9000-1 --json-rpc.enable --json-rpc.address=0.0.0.0:8545 --with-tendermint=false --grpc-only --rpc.laddr=tcp://host.docker.internal:26657 --node=tcp://host.docker.internal:26657 --transport="grpc" --pruning=nothing
     networks:
       localnet:
-        ipv4_address: 192.167.10.2
+        ipv4_address: 192.166.10.2
 
   node1:
     container_name: evmosnode1
     image: "evmos/node"
     ports:
-      - "26659-26660:26656-26657"
+      - "8245-8246:8545-8546"
+      - "21656-21658:26656-26658"
     volumes:
       - ./build/node1/evmosd:/evmos:Z
     command:
-      - /evmosd start --home /evmos
+      - /evmosd start --home /evmos --chain-id=evmos_9000-1 --json-rpc.enable --json-rpc.address=0.0.0.0:8545 --with-tendermint=false --grpc-only --rpc.laddr=tcp://host.docker.internal:26660 --node=tcp://host.docker.internal:26660 --transport="grpc" --pruning=nothing
     networks:
       localnet:
-        ipv4_address: 192.167.10.3
+        ipv4_address: 192.166.10.3
 
   node2:
     container_name: evmosnode2
     image: "evmos/node"
     ports:
-      - "26661-26662:26656-26657"
+      - "8345-8346:8545-8546"
+      - "22656-22658:26656-26658"
     volumes:
       - ./build/node2/evmosd:/evmos:Z
     command:
-      - /evmosd start --home /evmos
+      - /evmosd start --home /evmos --chain-id=evmos_9000-1 --json-rpc.enable --json-rpc.address=0.0.0.0:8545 --with-tendermint=false --grpc-only --rpc.laddr=tcp://host.docker.internal:26662 --node=tcp://host.docker.internal:26662 --transport="grpc" --pruning=nothing
     networks:
       localnet:
-        ipv4_address: 192.167.10.4
+        ipv4_address: 192.166.10.4
 
   node3:
     container_name: evmosnode3
     image: "evmos/node"
     ports:
-      - "26663-26664:26656-26657"
+      - "8445-8446:8545-8546"
+      - "23656-23658:26656-26658"
     volumes:
       - ./build/node3/evmosd:/evmos:Z
     command:
-      - /evmosd start --home /evmos
+      - /evmosd start --home /evmos --chain-id=evmos_9000-1 --json-rpc.enable --json-rpc.address=0.0.0.0:8545 --with-tendermint=false --grpc-only --rpc.laddr=tcp://host.docker.internal:26664 --node=tcp://host.docker.internal:26664 --transport="grpc" --pruning=nothing
     networks:
       localnet:
-        ipv4_address: 192.167.10.5
+        ipv4_address: 192.166.10.5
 
 networks:
   localnet:
@@ -60,4 +64,4 @@ networks:
       driver: default
       config:
         -
-          subnet: 192.167.10.0/16
+          subnet: 192.166.10.0/16

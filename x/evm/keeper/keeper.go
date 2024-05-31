@@ -126,6 +126,24 @@ func (k *Keeper) WithChainID(ctx sdk.Context) {
 	k.eip155ChainID = chainID
 }
 
+func (k *Keeper) SetChainID(chainIDStr string) {
+	chainID, err := evmostypes.ParseChainID(chainIDStr)
+
+	if err != nil {
+		panic(err)
+	}
+
+	if k.eip155ChainID != nil && k.eip155ChainID.Cmp(chainID) != 0 {
+		return
+	}
+
+	if !(chainID.Cmp(big.NewInt(9001)) == 0 || chainID.Cmp(big.NewInt(9000)) == 0) {
+		panic("EVM only supports Evmos chain identifiers (9000 or 9001)")
+	}
+
+	k.eip155ChainID = chainID
+}
+
 // ChainID returns the EIP155 chain ID for the EVM context
 func (k Keeper) ChainID() *big.Int {
 	return k.eip155ChainID

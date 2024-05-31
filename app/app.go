@@ -452,6 +452,8 @@ func NewEvmos(
 		tracer, app.GetSubspace(evmtypes.ModuleName),
 	)
 
+	evmKeeper.SetChainID(bApp.ChainID())
+
 	app.EvmKeeper = evmKeeper
 
 	// Create IBC Keeper
