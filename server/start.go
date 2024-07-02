@@ -31,6 +31,7 @@ import (
 	pvm "github.com/cometbft/cometbft/privval"
 	"github.com/cometbft/cometbft/proxy"
 	rpcclient "github.com/cometbft/cometbft/rpc/client"
+	rpchttp "github.com/cometbft/cometbft/rpc/client/http"
 	"github.com/cometbft/cometbft/rpc/client/local"
 
 	"cosmossdk.io/tools/rosetta"
@@ -425,6 +426,23 @@ func startInProcess(ctx *server.Context, clientCtx client.Context, opts StartOpt
 	// case, because it spawns a new local tendermint RPC client.
 	if (config.API.Enable || config.GRPC.Enable || config.JSONRPC.Enable || config.JSONRPC.EnableIndexer) && tmNode != nil {
 		clientCtx = clientCtx.WithClient(local.New(tmNode))
+
+		app.RegisterTxService(clientCtx)
+		app.RegisterTendermintService(clientCtx)
+		app.RegisterNodeService(clientCtx)
+	}
+
+	// TODO_SCALARIS: Remove this when we the newer version of Evmos has the remove tmNode
+	if (config.API.Enable || config.GRPC.Enable || config.JSONRPC.Enable || config.JSONRPC.EnableIndexer) && tmNode == nil {
+		// Connect to remote tendermint node
+		c, err := rpchttp.New(cfg.RPC.ListenAddress, "/websocket")
+		c.Logger = logger
+
+		if err != nil {
+			panic(err)
+		}
+
+		clientCtx = clientCtx.WithClient(c)
 
 		app.RegisterTxService(clientCtx)
 		app.RegisterTendermintService(clientCtx)
